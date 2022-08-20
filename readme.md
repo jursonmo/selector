@@ -14,9 +14,11 @@ Balancer 用于实现具体的随机选择算法。当然 如果要实现round_r
 实际的项目中，有两个节点服务器，比如 华北节点，华南节点， 广东地区的尽量上报给华南节点，如果华南节点有异常才考虑上报给华北节点，即对于需要上报数据的机器来说，这两个节点是主备关系。
 对于上报的机器来说，尽量尝试上报给第一个节点。在 [kratos selector](github.com/go-kratos/kratos/v2/selector) 基础上, 我自己添加一种“alway try the first available node” (即只要第一个节点可用，就永远使用第一个节点), 如果第一个节点异常后，业务层可以通过DoneInfo 的punishTime 来给这个失败的节点一个惩罚时间，即在这个惩罚时间内，不会再上报数据给这个节点。[example](https://github.com/jursonmo/selector/tree/master/example/tryfirst)
 
-##### TODO
+##### 带上熔断器
 当节点异常后时，给节点一个惩罚时间直接熔断，但这个时间不好定， 可以节点的错误率到达一定值才熔断，可以借鉴 google SRE 过载保护算法实现熔断器：
 rejectProba = max(0,(requests−K∗accepts)/(requests+1))
+
+[breaker example](https://github.com/jursonmo/selector/blob/master/example/tryfirst/breaker.go)
 
 
 
