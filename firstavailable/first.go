@@ -5,6 +5,7 @@ import (
 
 	"github.com/jursonmo/selector"
 	"github.com/jursonmo/selector/node/available"
+	"github.com/jursonmo/selector/node/circuitBreaker"
 )
 
 var (
@@ -18,7 +19,17 @@ var (
 type Balancer struct{}
 
 // New firstavailable a selector.
-func New() selector.Selector {
+func New(opts ...selector.SelectOption) selector.Selector {
+	option := &selector.SelectOptions{}
+	for _, opt := range opts {
+		opt(option)
+	}
+	if option.Breaker != nil {
+		return &selector.Default{
+			Balancer:    &Balancer{},
+			NodeBuilder: circuitBreaker.NewBuilder(option.Breaker),
+		}
+	}
 	return &selector.Default{
 		Balancer:    &Balancer{},
 		NodeBuilder: &available.Builder{},

@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/go-kratos/aegis/circuitbreaker"
 )
 
 // SelectOptions is Select Options.
 type SelectOptions struct {
 	Filters []Filter
+	Breaker circuitbreaker.CircuitBreaker
 }
 
 // SelectOption is Selector option.
@@ -21,6 +24,12 @@ type Filter func(context.Context, []Node) []Node
 func WithFilter(fn ...Filter) SelectOption {
 	return func(opts *SelectOptions) {
 		opts.Filters = fn
+	}
+}
+
+func WithBreaker(b circuitbreaker.CircuitBreaker) SelectOption {
+	return func(o *SelectOptions) {
+		o.Breaker = b
 	}
 }
 
